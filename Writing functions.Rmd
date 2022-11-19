@@ -52,6 +52,7 @@ z_scores = function(x) {
 z_scores(x_vec)
 ```
 
+* function is write inside the `{ }`, everything else is still in the global environment
 * creating the `z_scorea` function and naming the input as `x`
 * run the function `z_scorea` on our `x_vec`, which will give us the same answer as above
 
@@ -206,7 +207,9 @@ sim_mean_sd(100, 6, 3)
 
 
 
-## Revisiting past examples
+# Revisiting past examples
+
+## Past Example #1 Amazon reviews
 
 In "reading data from the web," we wrote code that allowed us to scrape information in Amazon reviews. 
 
@@ -323,3 +326,77 @@ dynamite_reviews
 `dynamite_urls = str_c(url_base, 1:5)` is a vector. We can show them individually just by `read_page_reviews(dynamite_urls[i])`. We can also combine all of them together by `bind_rows()`.
 
 When we combining them together, we are still copying and pasting `read_page_reviews(dynamite_urls[i])` which is not efficient. So we will need iteration, which will be cover in next few lectures. 
+
+
+
+## Past Example #2 LoTR data
+
+```{r eval=FALSE}
+fellowship_ring = readxl::read_excel("./data/LotR_Words.xlsx", range = "B3:D6") %>%
+  mutate(movie = "fellowship_ring")
+
+two_towers = readxl::read_excel("./data/LotR_Words.xlsx", range = "F3:H6") %>%
+  mutate(movie = "two_towers")
+
+return_king = readxl::read_excel("./data/LotR_Words.xlsx", range = "J3:L6") %>%
+  mutate(movie = "return_king")
+
+lotr_tidy = bind_rows(fellowship_ring, two_towers, return_king) %>%
+  janitor::clean_names() %>%
+  gather(key = sex, value = words, female:male) %>%
+  mutate(race = str_to_lower(race)) %>% 
+  select(movie, everything()) 
+```
+
+
+It can be rewrite into a function to read in and clean LoTR data:
+
+```{r eval=FALSE}
+lotr_load_and_tidy = function(path, range, movie_name) {
+  
+  df = readxl::read_excel(path, range = range) %>%
+    janitor::clean_names() %>%
+    gather(key = sex, value = words, female:male) %>%
+    mutate(race = str_to_lower(race),
+           movie = movie_name)
+  
+  df
+  
+}
+
+lotr_tidy = 
+  bind_rows(
+    lotr_load_and_tidy("./data/LotR_Words.xlsx", "B3:D6", "fellowship_ring"),
+    lotr_load_and_tidy("./data/LotR_Words.xlsx", "F3:H6", "two_towers"),
+    lotr_load_and_tidy("./data/LotR_Words.xlsx", "J3:L6", "return_king")) %>%
+  select(movie, everything()) 
+```
+
+
+
+## Functions as arguments
+
+One powerful tool is the ability to pass functions as arguments into functions. The example function below allows you to input a vector and a function, and returns the result of applying the specified function to the vector input.
+
+```{r}
+my_summary = function(x, summ_func) {
+  
+  summ_func(x)
+  
+}
+
+x_vec = rnorm(100, 3, 7)
+
+mean(x_vec)
+median(x_vec)
+
+my_summary(x_vec, mean)
+my_summary(x_vec, median)
+my_summary(x_vec, IQR)
+```
+
+This example is pretty trivial – you could just apply those functions directly to x and skip the hassle – but in many cases the idea of passing functions as arguments is really powerful. 
+
+
+
+

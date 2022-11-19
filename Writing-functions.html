@@ -380,11 +380,11 @@ pre code {
 <pre class="r"><code>x_vec = rnorm(25, mean = 5, sd = 3)
 
 (x_vec - mean(x_vec)) / sd(x_vec)</code></pre>
-<pre><code>##  [1]  0.62274882  0.13460455 -0.86643096  0.31315196  1.49303785  0.14731085
-##  [7] -1.83526228 -0.14168258 -1.60445601  0.54950917  0.34634696  0.15982741
-## [13]  0.42028806  0.51133575  0.81935341 -0.37697499  0.84954810 -1.36072432
-## [19] -0.46446934  2.55878825 -0.97376334  0.53675353 -0.40481188  0.01375034
-## [25] -1.44777929</code></pre>
+<pre><code>##  [1]  1.04119673 -1.04314903 -0.46421257 -1.35123374 -0.91697568 -1.83084367
+##  [7]  0.75195588  0.88903006  0.77373138 -0.22203946 -1.03975956  1.35619452
+## [13]  0.10788354 -0.49716223  1.33845716  0.33020425 -1.86186128  0.43184934
+## [19]  0.07609369 -0.19466229  1.83062535 -0.68178427  0.97551938 -0.01264550
+## [25]  0.21358798</code></pre>
 <p>Now, we want to write a function to compute z-scores</p>
 <pre class="r"><code>z_scores = function(x) {
   
@@ -395,12 +395,14 @@ pre code {
 }
 
 z_scores(x_vec)</code></pre>
-<pre><code>##  [1]  0.62274882  0.13460455 -0.86643096  0.31315196  1.49303785  0.14731085
-##  [7] -1.83526228 -0.14168258 -1.60445601  0.54950917  0.34634696  0.15982741
-## [13]  0.42028806  0.51133575  0.81935341 -0.37697499  0.84954810 -1.36072432
-## [19] -0.46446934  2.55878825 -0.97376334  0.53675353 -0.40481188  0.01375034
-## [25] -1.44777929</code></pre>
+<pre><code>##  [1]  1.04119673 -1.04314903 -0.46421257 -1.35123374 -0.91697568 -1.83084367
+##  [7]  0.75195588  0.88903006  0.77373138 -0.22203946 -1.03975956  1.35619452
+## [13]  0.10788354 -0.49716223  1.33845716  0.33020425 -1.86186128  0.43184934
+## [19]  0.07609369 -0.19466229  1.83062535 -0.68178427  0.97551938 -0.01264550
+## [25]  0.21358798</code></pre>
 <ul>
+<li>function is write inside the <code>{ }</code>, everything else is
+still in the global environment</li>
 <li>creating the <code>z_scorea</code> function and naming the input as
 <code>x</code></li>
 <li>run the function <code>z_scorea</code> on our <code>x_vec</code>,
@@ -421,11 +423,11 @@ these errors.</p>
 <pre class="r"><code>z_scores(c(TRUE, TRUE, FALSE, TRUE))</code></pre>
 <pre><code>## [1]  0.5  0.5 -1.5  0.5</code></pre>
 <pre class="r"><code>z_scores(sample(c(TRUE, FALSE), 25, replace = TRUE))</code></pre>
-<pre><code>##  [1]  1.4282857 -0.6721344  1.4282857  1.4282857 -0.6721344 -0.6721344
-##  [7]  1.4282857 -0.6721344  1.4282857 -0.6721344 -0.6721344  1.4282857
-## [13] -0.6721344 -0.6721344 -0.6721344 -0.6721344  1.4282857  1.4282857
-## [19] -0.6721344 -0.6721344 -0.6721344 -0.6721344 -0.6721344 -0.6721344
-## [25] -0.6721344</code></pre>
+<pre><code>##  [1] -1.0198039 -1.0198039  0.9413574 -1.0198039  0.9413574  0.9413574
+##  [7] -1.0198039 -1.0198039  0.9413574  0.9413574  0.9413574  0.9413574
+## [13] -1.0198039  0.9413574  0.9413574 -1.0198039 -1.0198039  0.9413574
+## [19] -1.0198039  0.9413574  0.9413574 -1.0198039 -1.0198039  0.9413574
+## [25] -1.0198039</code></pre>
 <ul>
 <li><code>z_scores(3)</code> is <code>NA</code> since the std for 3 is
 <code>NA</code></li>
@@ -451,7 +453,7 @@ R see them as 0 or 1. <strong>However</strong>, it should not work.</li>
 }
 
 z_scores(x_vec)</code></pre>
-<pre><code>## [1] 2.03103</code></pre>
+<pre><code>## [1] 1.521245</code></pre>
 <pre class="r"><code>z_scores(3)</code></pre>
 <pre><code>## Error in z_scores(3): Z scores cannot be computed for length 1 vectors</code></pre>
 <pre class="r"><code>z_scores(&quot;my name is jeff&quot;)</code></pre>
@@ -487,10 +489,10 @@ list.</p>
 <pre class="r"><code>x_vec = rnorm(100, mean = 3, sd =4)
 mean_and_sd(x_vec)</code></pre>
 <pre><code>## $mean
-## [1] 3.164845
+## [1] 3.150955
 ## 
 ## $sd
-## [1] 4.171221</code></pre>
+## [1] 3.950137</code></pre>
 <p>Alternatively, we might <strong>store values in a data
 frame</strong>, using <code>tibble()</code>.</p>
 <pre class="r"><code>mean_and_sd = function(x) {
@@ -513,7 +515,7 @@ frame</strong>, using <code>tibble()</code>.</p>
 <pre><code>## # A tibble: 1 × 2
 ##    mean    sd
 ##   &lt;dbl&gt; &lt;dbl&gt;
-## 1  3.16  4.17</code></pre>
+## 1  3.15  3.95</code></pre>
 <p>In general, either of these will be fine; which one you choose will
 depend on what kind of values you want to return, and what you plan to
 do with the function itself. If you want to return the original sample
@@ -539,7 +541,7 @@ sim_data %&gt;%
 <pre><code>## # A tibble: 1 × 2
 ##   mu_hat sigma_hat
 ##    &lt;dbl&gt;     &lt;dbl&gt;
-## 1   2.52      2.43</code></pre>
+## 1   2.04      2.67</code></pre>
 <p>You should examine this code – make sure it “makes sense”, take a
 look at the result of computing the mean and standard deviation, etc.
 Once you’re satisfied, it’s time to wrap things up in a function.</p>
@@ -573,10 +575,12 @@ standard deviation, is below.</p>
 <pre><code>## # A tibble: 1 × 2
 ##   mu_hat sigma_hat
 ##    &lt;dbl&gt;     &lt;dbl&gt;
-## 1   5.96      3.18</code></pre>
+## 1   6.18      3.20</code></pre>
 </div>
-<div id="revisiting-past-examples" class="section level2">
-<h2>Revisiting past examples</h2>
+<div id="revisiting-past-examples" class="section level1">
+<h1>Revisiting past examples</h1>
+<div id="past-example-1-amazon-reviews" class="section level2">
+<h2>Past Example #1 Amazon reviews</h2>
 <p>In “reading data from the web,” we wrote code that allowed us to
 scrape information in Amazon reviews.</p>
 <pre class="r"><code>url = &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=1&quot;
@@ -717,6 +721,71 @@ all of them together by <code>bind_rows()</code>.</p>
 <p>When we combining them together, we are still copying and pasting
 <code>read_page_reviews(dynamite_urls[i])</code> which is not efficient.
 So we will need iteration, which will be cover in next few lectures.</p>
+</div>
+</div>
+<div id="past-example-2-lotr-data" class="section level2">
+<h2>Past Example #2 LoTR data</h2>
+<pre class="r"><code>fellowship_ring = readxl::read_excel(&quot;./data/LotR_Words.xlsx&quot;, range = &quot;B3:D6&quot;) %&gt;%
+  mutate(movie = &quot;fellowship_ring&quot;)
+
+two_towers = readxl::read_excel(&quot;./data/LotR_Words.xlsx&quot;, range = &quot;F3:H6&quot;) %&gt;%
+  mutate(movie = &quot;two_towers&quot;)
+
+return_king = readxl::read_excel(&quot;./data/LotR_Words.xlsx&quot;, range = &quot;J3:L6&quot;) %&gt;%
+  mutate(movie = &quot;return_king&quot;)
+
+lotr_tidy = bind_rows(fellowship_ring, two_towers, return_king) %&gt;%
+  janitor::clean_names() %&gt;%
+  gather(key = sex, value = words, female:male) %&gt;%
+  mutate(race = str_to_lower(race)) %&gt;% 
+  select(movie, everything()) </code></pre>
+<p>It can be rewrite into a function to read in and clean LoTR data:</p>
+<pre class="r"><code>lotr_load_and_tidy = function(path, range, movie_name) {
+  
+  df = readxl::read_excel(path, range = range) %&gt;%
+    janitor::clean_names() %&gt;%
+    gather(key = sex, value = words, female:male) %&gt;%
+    mutate(race = str_to_lower(race),
+           movie = movie_name)
+  
+  df
+  
+}
+
+lotr_tidy = 
+  bind_rows(
+    lotr_load_and_tidy(&quot;./data/LotR_Words.xlsx&quot;, &quot;B3:D6&quot;, &quot;fellowship_ring&quot;),
+    lotr_load_and_tidy(&quot;./data/LotR_Words.xlsx&quot;, &quot;F3:H6&quot;, &quot;two_towers&quot;),
+    lotr_load_and_tidy(&quot;./data/LotR_Words.xlsx&quot;, &quot;J3:L6&quot;, &quot;return_king&quot;)) %&gt;%
+  select(movie, everything()) </code></pre>
+</div>
+<div id="functions-as-arguments" class="section level2">
+<h2>Functions as arguments</h2>
+<p>One powerful tool is the ability to pass functions as arguments into
+functions. The example function below allows you to input a vector and a
+function, and returns the result of applying the specified function to
+the vector input.</p>
+<pre class="r"><code>my_summary = function(x, summ_func) {
+  
+  summ_func(x)
+  
+}
+
+x_vec = rnorm(100, 3, 7)
+
+mean(x_vec)</code></pre>
+<pre><code>## [1] 2.803685</code></pre>
+<pre class="r"><code>median(x_vec)</code></pre>
+<pre><code>## [1] 2.388542</code></pre>
+<pre class="r"><code>my_summary(x_vec, mean)</code></pre>
+<pre><code>## [1] 2.803685</code></pre>
+<pre class="r"><code>my_summary(x_vec, median)</code></pre>
+<pre><code>## [1] 2.388542</code></pre>
+<pre class="r"><code>my_summary(x_vec, IQR)</code></pre>
+<pre><code>## [1] 8.12643</code></pre>
+<p>This example is pretty trivial – you could just apply those functions
+directly to x and skip the hassle – but in many cases the idea of
+passing functions as arguments is really powerful.</p>
 </div>
 </div>
 
