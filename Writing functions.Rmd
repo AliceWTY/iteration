@@ -205,3 +205,121 @@ sim_mean_sd(100, 6, 3)
 ```
 
 
+
+## Revisiting past examples
+
+In "reading data from the web," we wrote code that allowed us to scrape information in Amazon reviews. 
+
+```{r}
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %>%
+  html_nodes(".a-text-bold span") %>%
+  html_text()
+
+review_stars = 
+  dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text() %>%
+  str_extract("^\\d") %>%
+  as.numeric()
+
+review_text = 
+  dynamite_html %>%
+  html_nodes(".review-text-content span") %>%
+  html_text() %>% 
+  str_replace_all("\n", "") %>% 
+  str_trim()
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+```
+
+What we did:
+* `html_nodes("given CSS tages")` select the info based on the given CSS tages
+* `html_text()` convert them into text
+* `str_extract("^\\d")` regular the structure, `\\d` means get the first digit number between 0 and 9, `^` means from the starting of the steam
+* `as.numeric()` change the character into numeric
+* `str_replace_all("\n", "")` replace all "\n" with " "
+* `str_trim()` trim down the empty space
+
+
+Note: `".a-text-bold span"`, `"#cm_cr-review_list .review-rating"`, `".review-text-content span"` are CSS tages, you can get them from CSS tage auto selector. The one professor use is **SelectorGadget**. Google it!
+
+### What about other pages
+
+This is the review from page#1, what about other pages. We don't want to copy this code chunk for every pages (URLs). We want to make it into a function.
+
+Let’s write a quick function to scrape review information for any URL to an Amazon review page. Note that this contains some extra code for manipulating the `review_text` – our previous code worked for the first page, but broke on a later page. The added lines remove entries in `review_text` that come from embedded images after extracting text from HTML using CSS tags.
+
+```{r}
+read_page_reviews = function(url) {
+  
+  html = read_html(url)
+  
+  review_titles = 
+    html %>%
+    html_nodes(".a-text-bold span") %>%
+    html_text()
+  
+  review_stars = 
+    html %>%
+    html_nodes("#cm_cr-review_list .review-rating") %>%
+    html_text() %>%
+    str_extract("^\\d") %>%
+    as.numeric()
+  
+  review_text = 
+    html %>%
+    html_nodes(".review-text-content span") %>%
+    html_text() %>% 
+    str_replace_all("\n", "") %>% 
+    str_trim() %>% 
+    str_subset("The media could not be loaded.", negate = TRUE) %>% 
+    str_subset("^$", negate = TRUE)
+  
+  review = 
+    tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+  )
+  
+  review
+}
+```
+
+
+```{r}
+dynamite_url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=2"
+
+read_page_reviews(dynamite_url)
+```
+
+Next we’ll use this to read in reviews from a few pages and combine the results.
+
+```{r}
+dynamite_url_base = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber="
+
+dynamite_urls = str_c(dynamite_url_base, 1:5)
+
+dynamite_reviews = bind_rows(
+  read_page_reviews(dynamite_urls[1]),
+  read_page_reviews(dynamite_urls[2]),
+  read_page_reviews(dynamite_urls[3]),
+  read_page_reviews(dynamite_urls[4]),
+  read_page_reviews(dynamite_urls[5])
+)
+
+dynamite_reviews
+```
+
+`dynamite_urls = str_c(url_base, 1:5)` is a vector. We can show them individually just by `read_page_reviews(dynamite_urls[i])`. We can also combine all of them together by `bind_rows()`.
+
+When we combining them together, we are still copying and pasting `read_page_reviews(dynamite_urls[i])` which is not efficient. So we will need iteration, which will be cover in next few lectures. 
