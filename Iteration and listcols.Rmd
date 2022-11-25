@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(rvest)
+library(purrr)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -131,5 +132,98 @@ We already have our input list, `list_norms`. In the above code, we are creating
 
 
 ## maps
+
+The **first argument** to `map()` is the list (or vector, or data frame) we want to iterate over, and the **second argument** is the function we want to apply to each element.
+
+This following code will produce the same results as the above chuck, but `map` will track the name better, and you don't need to define your output vector / list. Since our input list has **a, b, c, d**, the `map` output will also name their results as **$a, $b, $c, $d**.
+
+```{r}
+output = map(list_norms, mean_and_sd)
+```
+
+It’s sometimes necessary to be more specific in giving arguments to `map`. In particular, using `.x = list_norms` for the input list and `~ mean_and_sd(.x)` to *specify the function applied to the input list* (using .x as a placeholder) will produce the same result.
+
+```{r}
+output = map(.x = list_norms, ~ mean_and_sd(.x))
+```
+
+### What if we want a different function? 
+Functions can be passed as arguments to other functions. 
+
+```{r}
+output = map(list_norms, median)
+```
+
+## `map` variants
+
+There are some useful variants to the basic map function if you know what kind of output you’re going to produce. 
+
+The above is a list. Below we use `map_dbl` because *median outputs a single numeric value each time*. The result is a vector instead of a list. 
+```{r}
+output = map_dbl(list_norms, median)
+```
+Note: If we tried to use `map_int` or `map_lgl`, we’d get an error because the output of median isn’t a integer or a logical. 
+
+Similarly, since we know `mean_and_sd` produces a data frame, we can use the output-specific `map_df` to change it to a datafram(df). Using the `.id` argument **keeps the names of the elements in the input list**.
+
+```{r}
+output = map_df(list_norms, mean_and_sd, .id = "input")
+```
+
+Lastly, the variant `map2` (and `map2_dbl`, etc) is helpful **when your function has two arguments**. In these cases, I find it best to be specific about arguments using something like the following:
+
+```{r eval=FALSE}
+output = map2(.x = input_1, .y = input_2, ~func(arg_1 = .x, arg_2 = .y))
+```
+
+## List columns and operation
+
+```{r}
+listcol_df = 
+  tibble(
+    name = c("a", "b", "c", "d"),
+    samp = list_norms
+  )
+```
+
+The `name` column is a character column. If you pull `name` column from the `listcol_df` data frame, the result is a character vector. Similarly, the `samp` column is a list column. You can also do some operation on it, such as `filter` or only examine the first list.
+
+```{r}
+listcol_df %>% pull(name)
+listcol_df %>% pull(samp)
+
+listcol_df %>% 
+  filter(name == "a")
+
+listcol_df$samp[[1]]
+```
+
+
+You can manipulate list columns, but usual operations for columns that might appear in mutate (like `mean` or `recode`) often *don’t apply to the entries in a list column*. Instead, recognizing list columns as list columns motivates alternative ways to work with them.
+
+Let’s apply `mean_and_sd` to the first element of our list column.
+
+```{r}
+mean_and_sd(listcol_df$samp[[1]])
+```
+
+Keeping in mind that `listcol_df$samp` is a list, we can apply `mean_and_sd` function to each element using **`map`**.
+
+```{r}
+map(listcol_df$samp, mean_and_sd)
+```
+
+We’ve been using `mutate` to define a new variable in a data frame, especially one that is a function of an existing variable. We can also use `mutate` to add list columns in data frame. 
+
+```{r}
+listcol_df = 
+  listcol_df %>% 
+  mutate(summary = map(samp, mean_and_sd),
+         medians = map_dbl(samp,median))
+
+listcol_df
+```
+
+
 
 

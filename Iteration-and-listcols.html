@@ -403,7 +403,7 @@ l</code></pre>
 ## 
 ## $summary
 ##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## -3.66775 -0.69816  0.12066  0.07253  0.86494  2.63088</code></pre>
+## -2.34048 -0.58271  0.07036  0.04718  0.61767  2.23899</code></pre>
 <p>Lists can be accessed using names or indices. The following commends
 give you the same thing.</p>
 <pre class="r"><code>l$vec_numeric</code></pre>
@@ -433,25 +433,25 @@ is.list(list_norms)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <pre class="r"><code>list_norms</code></pre>
 <pre><code>## $a
-##  [1] 1.347216 3.305261 3.674171 2.161022 3.420185 1.258844 1.726537 1.077150
-##  [9] 2.669294 4.470032 2.744531 2.590431 2.357283 2.344253 3.327094 1.259122
-## [17] 3.514394 3.457015 3.953599 3.321810
+##  [1] 3.6300361 2.9465221 3.0285391 2.8142935 3.8400306 3.4808025 3.3990129
+##  [8] 2.4925848 3.9195662 0.3479994 3.6617688 2.5889322 2.9402559 1.9608413
+## [15] 0.8382147 2.4264073 1.7875596 2.9807611 3.1852727 4.8344568
 ## 
 ## $b
-##  [1] -5.3994940 -3.6827305  9.6742216  0.5576404  1.6736524  5.5145586
-##  [7] -0.0952165 -8.0499630 -3.4042597  2.3800683  3.5170723 -2.3259406
-## [13]  3.3384816  4.9806271 -5.4933910  0.9196594 -1.7740251  1.2759902
-## [19] -9.4152791  4.6549708
+##  [1] -3.0356139 -3.5708111 -2.0155047 -5.3846009  5.5008291 -0.0147905
+##  [7] -1.3471586 10.1916949  2.0716635  5.8728093  4.2543506  5.9633816
+## [13]  4.8500773  1.3719064  1.5647153  1.0151569 -2.4453253 -3.1459333
+## [19]  1.4942774  4.1009027
 ## 
 ## $c
-##  [1]  9.719325  9.836437 10.225288  9.977197  9.785529  9.860480 10.107773
-##  [8] 10.107790  9.964635  9.850636 10.208495  9.846249  9.870568 10.010497
-## [15] 10.003152 10.061672 10.382107  9.944672  9.886907  9.827497
+##  [1] 10.243773 10.033313  9.787885 10.104259 10.118849 10.181536  9.997207
+##  [8]  9.752561 10.010184 10.103795 10.140739  9.741969  9.668577 10.350322
+## [15]  9.922120  9.766502 10.021976 10.266264 10.170665  9.850223
 ## 
 ## $d
-##  [1] -2.703536 -4.755770 -2.079687 -2.580126 -4.074661 -3.715578 -3.294353
-##  [8] -3.795716 -2.500766 -4.274312 -3.462266 -3.744225 -1.372416 -3.743397
-## [15] -2.359131 -4.117161 -2.073682 -1.999272 -4.568528 -3.207628</code></pre>
+##  [1] -2.783664 -3.446075 -2.790366 -2.318359 -2.917654 -2.378055 -3.200690
+##  [8] -2.834697 -3.172358 -4.626921 -2.451550 -1.242214 -3.323685 -4.359959
+## [15] -1.037166 -2.346361 -2.298184 -2.877223 -2.862535 -3.826127</code></pre>
 <p>I’d like to apply my simple <code>mean_and_sd</code> function from
 writing functions to each element of this list For completeness, that
 function is below.</p>
@@ -479,22 +479,22 @@ list_norms using the lines below.</p>
 <pre><code>## # A tibble: 1 × 2
 ##    mean    sd
 ##   &lt;dbl&gt; &lt;dbl&gt;
-## 1  2.70 0.991</code></pre>
+## 1  2.86  1.05</code></pre>
 <pre class="r"><code>mean_and_sd(list_norms[[2]])</code></pre>
 <pre><code>## # A tibble: 1 × 2
-##      mean    sd
-##     &lt;dbl&gt; &lt;dbl&gt;
-## 1 -0.0577  4.88</code></pre>
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  1.36  4.04</code></pre>
 <pre class="r"><code>mean_and_sd(list_norms[[3]])</code></pre>
 <pre><code>## # A tibble: 1 × 2
 ##    mean    sd
 ##   &lt;dbl&gt; &lt;dbl&gt;
-## 1  9.97 0.168</code></pre>
+## 1  10.0 0.197</code></pre>
 <pre class="r"><code>mean_and_sd(list_norms[[4]])</code></pre>
 <pre><code>## # A tibble: 1 × 2
 ##    mean    sd
 ##   &lt;dbl&gt; &lt;dbl&gt;
-## 1 -3.22 0.959</code></pre>
+## 1 -2.85 0.868</code></pre>
 <p>Let’s used a <code>for</code> loop.</p>
 <p>Below, I define an output list with the same number of entries as my
 target dataframe; a sequence to iterate over; and a for loop body that
@@ -514,6 +514,151 @@ list.
 </div>
 <div id="maps" class="section level2">
 <h2>maps</h2>
+<p>The <strong>first argument</strong> to <code>map()</code> is the list
+(or vector, or data frame) we want to iterate over, and the
+<strong>second argument</strong> is the function we want to apply to
+each element.</p>
+<p>This following code will produce the same results as the above chuck,
+but <code>map</code> will track the name better, and you don’t need to
+define your output vector / list. Since our input list has <strong>a, b,
+c, d</strong>, the <code>map</code> output will also name their results
+as <strong>$a, $b, $c, $d</strong>.</p>
+<pre class="r"><code>output = map(list_norms, mean_and_sd)</code></pre>
+<p>It’s sometimes necessary to be more specific in giving arguments to
+<code>map</code>. In particular, using <code>.x = list_norms</code> for
+the input list and <code>~ mean_and_sd(.x)</code> to <em>specify the
+function applied to the input list</em> (using .x as a placeholder) will
+produce the same result.</p>
+<pre class="r"><code>output = map(.x = list_norms, ~ mean_and_sd(.x))</code></pre>
+<div id="what-if-we-want-a-different-function" class="section level3">
+<h3>What if we want a different function?</h3>
+<p>Functions can be passed as arguments to other functions.</p>
+<pre class="r"><code>output = map(list_norms, median)</code></pre>
+</div>
+</div>
+<div id="map-variants" class="section level2">
+<h2><code>map</code> variants</h2>
+<p>There are some useful variants to the basic map function if you know
+what kind of output you’re going to produce.</p>
+<p>The above is a list. Below we use <code>map_dbl</code> because
+<em>median outputs a single numeric value each time</em>. The result is
+a vector instead of a list.</p>
+<pre class="r"><code>output = map_dbl(list_norms, median)</code></pre>
+<p>Note: If we tried to use <code>map_int</code> or
+<code>map_lgl</code>, we’d get an error because the output of median
+isn’t a integer or a logical.</p>
+<p>Similarly, since we know <code>mean_and_sd</code> produces a data
+frame, we can use the output-specific <code>map_df</code> to change it
+to a datafram(df). Using the <code>.id</code> argument <strong>keeps the
+names of the elements in the input list</strong>.</p>
+<pre class="r"><code>output = map_df(list_norms, mean_and_sd, .id = &quot;input&quot;)</code></pre>
+<p>Lastly, the variant <code>map2</code> (and <code>map2_dbl</code>,
+etc) is helpful <strong>when your function has two arguments</strong>.
+In these cases, I find it best to be specific about arguments using
+something like the following:</p>
+<pre class="r"><code>output = map2(.x = input_1, .y = input_2, ~func(arg_1 = .x, arg_2 = .y))</code></pre>
+</div>
+<div id="list-columns-and-operation" class="section level2">
+<h2>List columns and operation</h2>
+<pre class="r"><code>listcol_df = 
+  tibble(
+    name = c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;),
+    samp = list_norms
+  )</code></pre>
+<p>The <code>name</code> column is a character column. If you pull
+<code>name</code> column from the <code>listcol_df</code> data frame,
+the result is a character vector. Similarly, the <code>samp</code>
+column is a list column. You can also do some operation on it, such as
+<code>filter</code> or only examine the first list.</p>
+<pre class="r"><code>listcol_df %&gt;% pull(name)</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot;</code></pre>
+<pre class="r"><code>listcol_df %&gt;% pull(samp)</code></pre>
+<pre><code>## $a
+##  [1] 3.6300361 2.9465221 3.0285391 2.8142935 3.8400306 3.4808025 3.3990129
+##  [8] 2.4925848 3.9195662 0.3479994 3.6617688 2.5889322 2.9402559 1.9608413
+## [15] 0.8382147 2.4264073 1.7875596 2.9807611 3.1852727 4.8344568
+## 
+## $b
+##  [1] -3.0356139 -3.5708111 -2.0155047 -5.3846009  5.5008291 -0.0147905
+##  [7] -1.3471586 10.1916949  2.0716635  5.8728093  4.2543506  5.9633816
+## [13]  4.8500773  1.3719064  1.5647153  1.0151569 -2.4453253 -3.1459333
+## [19]  1.4942774  4.1009027
+## 
+## $c
+##  [1] 10.243773 10.033313  9.787885 10.104259 10.118849 10.181536  9.997207
+##  [8]  9.752561 10.010184 10.103795 10.140739  9.741969  9.668577 10.350322
+## [15]  9.922120  9.766502 10.021976 10.266264 10.170665  9.850223
+## 
+## $d
+##  [1] -2.783664 -3.446075 -2.790366 -2.318359 -2.917654 -2.378055 -3.200690
+##  [8] -2.834697 -3.172358 -4.626921 -2.451550 -1.242214 -3.323685 -4.359959
+## [15] -1.037166 -2.346361 -2.298184 -2.877223 -2.862535 -3.826127</code></pre>
+<pre class="r"><code>listcol_df %&gt;% 
+  filter(name == &quot;a&quot;)</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##   name  samp        
+##   &lt;chr&gt; &lt;named list&gt;
+## 1 a     &lt;dbl [20]&gt;</code></pre>
+<pre class="r"><code>listcol_df$samp[[1]]</code></pre>
+<pre><code>##  [1] 3.6300361 2.9465221 3.0285391 2.8142935 3.8400306 3.4808025 3.3990129
+##  [8] 2.4925848 3.9195662 0.3479994 3.6617688 2.5889322 2.9402559 1.9608413
+## [15] 0.8382147 2.4264073 1.7875596 2.9807611 3.1852727 4.8344568</code></pre>
+<p>You can manipulate list columns, but usual operations for columns
+that might appear in mutate (like <code>mean</code> or
+<code>recode</code>) often <em>don’t apply to the entries in a list
+column</em>. Instead, recognizing list columns as list columns motivates
+alternative ways to work with them.</p>
+<p>Let’s apply <code>mean_and_sd</code> to the first element of our list
+column.</p>
+<pre class="r"><code>mean_and_sd(listcol_df$samp[[1]])</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  2.86  1.05</code></pre>
+<p>Keeping in mind that <code>listcol_df$samp</code> is a list, we can
+apply <code>mean_and_sd</code> function to each element using
+<strong><code>map</code></strong>.</p>
+<pre class="r"><code>map(listcol_df$samp, mean_and_sd)</code></pre>
+<pre><code>## $a
+## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  2.86  1.05
+## 
+## $b
+## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  1.36  4.04
+## 
+## $c
+## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  10.0 0.197
+## 
+## $d
+## # A tibble: 1 × 2
+##    mean    sd
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1 -2.85 0.868</code></pre>
+<p>We’ve been using <code>mutate</code> to define a new variable in a
+data frame, especially one that is a function of an existing variable.
+We can also use <code>mutate</code> to add list columns in data
+frame.</p>
+<pre class="r"><code>listcol_df = 
+  listcol_df %&gt;% 
+  mutate(summary = map(samp, mean_and_sd),
+         medians = map_dbl(samp,median))
+
+listcol_df</code></pre>
+<pre><code>## # A tibble: 4 × 4
+##   name  samp         summary          medians
+##   &lt;chr&gt; &lt;named list&gt; &lt;named list&gt;       &lt;dbl&gt;
+## 1 a     &lt;dbl [20]&gt;   &lt;tibble [1 × 2]&gt;    2.96
+## 2 b     &lt;dbl [20]&gt;   &lt;tibble [1 × 2]&gt;    1.43
+## 3 c     &lt;dbl [20]&gt;   &lt;tibble [1 × 2]&gt;   10.0 
+## 4 d     &lt;dbl [20]&gt;   &lt;tibble [1 × 2]&gt;   -2.85</code></pre>
 </div>
 
 
