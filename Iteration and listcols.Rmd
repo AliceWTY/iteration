@@ -1,0 +1,135 @@
+---
+title: "Iteration and listcols"
+author: "Tianyou Wang"
+date: "2022-11-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+
+## Lists
+
+In R, vectors are limited to a single data class – all elements have to be characters, or all numeric, or all logical. Trying to join the following vectors will result in coersion, as would creating vectors of mixed types.
+
+```{r}
+vec_numeric = 5:8
+vec_logical = c(TRUE, TRUE, FALSE, TRUE, FALSE, FALSE)
+mat =  matrix(1:8, nrow = 2, ncol = 4)
+summary = summary(rnorm(100))
+```
+
+We can put anything in a list.This flexibility is great, but is offset by chunkiness. 
+
+```{r}
+l = list(
+  vec_numeric = 5:8,
+  vec_logical = c(TRUE, TRUE, FALSE, TRUE, FALSE, FALSE),
+  mat =  matrix(1:8, nrow = 2, ncol = 4),
+  summary = summary(rnorm(100))
+)
+
+l
+```
+
+Lists can be accessed using names or indices. The following commends give you the same thing.
+
+```{r}
+l$vec_numeric
+l[[1]]
+l[["vec_numeric"]]
+```
+
+Lists are really useful. Right now, we’ll use them to hold general inputs and outputs of iterative processes. Even more importantly, we’ll see that data frames are actually a very specific kind of list – one comprised of vectors of the same length – which is why they can store variables of different types.
+
+
+
+## `for` loop
+
+For this example, I’m going to start with the list defined below.
+
+```{r}
+list_norms = 
+  list(
+    a = rnorm(20, 3, 1),
+    b = rnorm(20, 0, 5),
+    c = rnorm(20, 10, .2),
+    d = rnorm(20, -3, 1)
+  )
+
+is.list(list_norms)
+```
+
+```{r}
+list_norms
+```
+
+I’d like to apply my simple `mean_and_sd` function from writing functions to each element of this list For completeness, that function is below.
+
+```{r}
+mean_and_sd = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } 
+  
+  if (length(x) == 1) {
+    stop("Cannot be computed for length 1 vectors")
+  }
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+
+  tibble(
+    mean = mean_x, 
+    sd = sd_x
+  )
+}
+```
+
+We can apply the `mean_and_sd` function to each element of list_norms using the lines below.
+
+```{r}
+mean_and_sd(list_norms[[1]])
+mean_and_sd(list_norms[[2]])
+mean_and_sd(list_norms[[3]])
+mean_and_sd(list_norms[[4]])
+```
+
+Let's used a `for` loop.
+
+Below, I define an output list with the same number of entries as my target dataframe; a sequence to iterate over; and a for loop body that applies the `mean_and_sd` function for each sequence element and saves the result. This will be much cleaner than using four almost-identical lines of code
+
+```{r}
+output = vector("list", length = 4)
+
+for (i in 1:4) {
+  output[[i]] = mean_and_sd(list_norms[[i]])
+}
+```
+
+We already have our input list, `list_norms`. In the above code, we are creating the output list. Creating a vector that is a list, and the length equals to 4. The length just equal the length of input list. **`vector(mode = "logical/list etc", length = )`**
+
+
+## maps
+
+
