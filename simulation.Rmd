@@ -1,0 +1,197 @@
+---
+title: "Simulation"
+author: "Tianyou Wang"
+date: "2022-11-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rvest)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+
+set.seed(1)
+```
+
+Note: `set.seed(1)` setting will let R give you the same numbers for `rnorm` for every single time you knit your file.
+
+
+## Simulation: Mean and SD for one n
+
+In *writing functions* we wrote a short function to simulate data from a normal distribution, and return estimates of the mean and standard deviation.
+
+```{r}
+sim_mean_sd = function(n, mu = 2, sigma = 3) {
+  
+  sim_data = 
+    tibble(
+      x = rnorm(n, mean = mu, sd = sigma),
+  )
+  
+  sim_data %>% 
+    summarize(
+      mu_hat = mean(x),
+      sigma_hat = sd(x)
+    )
+}
+```
+
+```{r}
+sim_mean_sd(30)
+```
+
+Let’s run `sim_mean_sd()` 100 times to see the effect of randomness in xi on estimates μ̂ ,σ̂ .
+
+Start with a `for` loop.
+
+```{r}
+output = vector("list", 100)
+
+for (i in 1:100) {
+  output[[i]] = sim_mean_sd(30)
+}
+
+sim_results = bind_rows(output)
+```
+
+Let's use a loop function, `rerun`. This will give us the same thing. Note: `rerun(number of times, expressions to re-run)`
+
+```{r}
+sim_results = 
+rerun(100, sim_mean_sd(n = 30)) %>% 
+  bind_rows()
+```
+
+Let’s make some quick plots and compute some summaries for our simulation results.
+```{r}
+sim_results %>% 
+  ggplot(aes(x = mu_hat)) +
+  geom_density()
+
+sim_results %>% 
+  ggplot(aes(x = sigma_hat)) +
+  geom_density()
+
+sim_results %>% 
+  summarize(
+    avg_samp_mean = mean(mu_hat),
+    sd_samp_mean = sd(mu_hat)
+  )
+```
+
+
+
+## Simulation: Mean for several  n
+
+```{r}
+n_list = list(
+  "n = 30" = 30,
+  "n = 60" = 60,
+  "n = 120" = 120,
+  "n = 240" = 240
+)
+
+output = vector("list", length = 4)
+
+output[[1]] = rerun(100, sim_mean_sd(n = n_list[[1]])) %>% 
+  bind_rows()
+
+output[[2]] = rerun(100, sim_mean_sd(n = n_list[[2]])) %>% 
+  bind_rows()
+```
+
+To avoid using `output[[1]] = rerun(100, sim_mean_sd(n = n_list[[1]]))` multiple times, we gonna write a `for` loop.
+
+```{r}
+for (i in 1:4) {
+  output[[i]] = rerun(100, sim_mean_sd(n = n_list[[i]])) %>% 
+  bind_rows()
+}
+```
+
+The above two chunks can also be down by this following code, use `expand_grid`.
+
+```{r}
+?expand_grid
+```
+
+```{r eval=FALSE}
+sim_results_df = 
+  expand_grid(
+    sample_size = c(30, 60, 120, 240),
+    iter = 1:1000
+  ) %>% 
+  mutate(
+    estimate_df = map(sample_size, sim_mean_sd)
+  ) %>% 
+  unnest(estimate_df)
+```
+
+We want to track everything we have into a data frame.
+```{r}
+sim_results = 
+tibble(
+  sample_size = c(30, 60, 120, 240)
+) %>% 
+  mutate(
+    output_lists = map(.x = sample_size, ~ rerun(1000, sim_mean_sd(.x))),
+    estimate_df = map(output_lists, bind_rows)
+  ) %>% 
+  select(-output_lists) %>% 
+  unnest(estimate_df)
+```
+
+
+Do some data frame things.
+
+```{r}
+sim_results %>% 
+  mutate(
+    sample_size = str_c("n = ", sample_size),
+    sample_size = fct_inorder(sample_size)) %>% 
+  ggplot(aes(x = sample_size, y = mu_hat, fill = sample_size)) + 
+  geom_violin()
+```
+
+```{r}
+sim_results %>% 
+  group_by(sample_size) %>% 
+  summarize(
+    ave_samp_mean = mean(mu_hat),
+    sd_samp_mean = sd(mu_hat)
+  )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
