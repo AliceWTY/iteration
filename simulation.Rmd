@@ -55,7 +55,10 @@ sim_mean_sd = function(n, mu = 2, sigma = 3) {
 sim_mean_sd(30)
 ```
 
-Let’s run `sim_mean_sd()` 100 times to see the effect of randomness in xi on estimates μ̂ ,σ̂ .
+Let’s run `sim_mean_sd()` 100 times to see the effect of randomness in xi on estimates μ̂ ,σ̂.There are multiple ways.
+
+
+### **#1 `for` loop**
 
 Start with a `for` loop.
 
@@ -69,13 +72,40 @@ for (i in 1:100) {
 sim_results = bind_rows(output)
 ```
 
-Let's use a loop function, `rerun`. This will give us the same thing. Note: `rerun(number of times, expressions to re-run)`
+
+### **#2 loop function `rerun`**
+
+Let's use a loop function, `rerun`. This will give us the same thing as the chunk above. Note: `rerun(number of times, expressions to re-run)`
 
 ```{r}
 sim_results = 
 rerun(100, sim_mean_sd(n = 30)) %>% 
   bind_rows()
 ```
+
+
+### **#3 `expand_grid(., iter = )`**
+
+The same thing can also be done by using `expand_grid()`
+
+```{r}
+?expand_grid
+```
+
+```{r}
+sim_results_df = 
+  expand_grid(
+    sample_size = 30,
+    iter = 1:100
+  ) %>% 
+  mutate(
+    estimate_df = map(sample_size, sim_mean_sd)
+  ) %>% 
+  unnest(estimate_df)
+```
+
+
+### **plots and summaries**
 
 Let’s make some quick plots and compute some summaries for our simulation results.
 ```{r}
@@ -92,11 +122,28 @@ sim_results %>%
     avg_samp_mean = mean(mu_hat),
     sd_samp_mean = sd(mu_hat)
   )
+
+sim_results %>% 
+  pivot_longer(
+    mu_hat:sigma_hat,
+    names_to = "parameter", 
+    values_to = "estimate") %>% 
+  group_by(parameter) %>% 
+  summarize(
+    emp_mean = mean(estimate),
+    emp_sd = sd(estimate)) %>% 
+  knitr::kable(digits = 3)
 ```
 
 
 
-## Simulation: Mean for several  n
+
+
+## Simulation: Mean for several  n's
+
+Sample size makes a huge difference on the variance of estimates in SLR (and pretty much every statistical method). Let’s try to clarify that effect through simulating at a few sample sizes. Similarily, we will look into few ways.
+
+### **#1 `for` loop**
 
 ```{r}
 n_list = list(
@@ -124,25 +171,11 @@ for (i in 1:4) {
 }
 ```
 
-The above two chunks can also be down by this following code, use `expand_grid`.
 
-```{r}
-?expand_grid
-```
+### **#2 loop function `rerun` in `map`**
 
-```{r eval=FALSE}
-sim_results_df = 
-  expand_grid(
-    sample_size = c(30, 60, 120, 240),
-    iter = 1:1000
-  ) %>% 
-  mutate(
-    estimate_df = map(sample_size, sim_mean_sd)
-  ) %>% 
-  unnest(estimate_df)
-```
+The above two chunks can also be down by this following code. We want to track everything we have into one data frame.
 
-We want to track everything we have into a data frame.
 ```{r}
 sim_results = 
 tibble(
@@ -157,7 +190,26 @@ tibble(
 ```
 
 
-Do some data frame things.
+### **#3 `expand_grid(sample_size = , iter = )`**
+
+We set up a tibble with iterations and the sample sizes we want to investigate using `expand_grid`.
+
+```{r eval=FALSE}
+sim_results_df = 
+  expand_grid(
+    sample_size = c(30, 60, 120, 240),
+    iter = 1:1000
+  ) %>% 
+  mutate(
+    estimate_df = map(sample_size, sim_mean_sd)
+  ) %>% 
+  unnest(estimate_df)
+```
+
+
+### **plots and summaries**
+
+Violin graph: density distribution for the 1000 mu_hat's among each sample size groups.
 
 ```{r}
 sim_results %>% 
@@ -168,6 +220,7 @@ sim_results %>%
   geom_violin()
 ```
 
+Let's look at the emprical mean and variance of the mean estimators (mu_hats).
 ```{r}
 sim_results %>% 
   group_by(sample_size) %>% 
@@ -177,11 +230,53 @@ sim_results %>%
   )
 ```
 
+Lastly I’ll look at the empirical mean and variance of both the mean estimator (mu_hats) and std estimator (sigma_hat).
+
+```{r}
+sim_results %>% 
+  pivot_longer(
+    mu_hat:sigma_hat,
+    names_to = "parameter", 
+    values_to = "estimate") %>% 
+  group_by(parameter, sample_size) %>% 
+  summarize(
+    emp_mean = mean(estimate),
+    emp_var = var(estimate)) %>% 
+  knitr::kable(digits = 3)
+```
 
 
 
 
+## Varying two simulation parameters
 
+`map2()` example:
+
+```{r}
+sim_results_df = 
+  expand_grid(
+    sample_size = c(30, 60, 120, 240),
+    true_sd = c(6, 3),
+    iter = 1:1000
+  ) %>% 
+  mutate(
+    estimate_df = 
+      map2(.x = sample_size, .y = true_sd, ~ sim_mean_sd(n = .x, sigma = .y))
+  ) %>% 
+  unnest(estimate_df)
+```
+
+Violin graph.
+
+```{r}
+sim_results_df %>% 
+  mutate(
+    sample_size = str_c("n = ", sample_size),
+    sample_size = fct_inorder(sample_size)) %>% 
+  ggplot(aes(x = sample_size, y = mu_hat, fill = sample_size)) + 
+  geom_violin() + 
+  facet_grid(. ~ true_sd)
+```
 
 
 
